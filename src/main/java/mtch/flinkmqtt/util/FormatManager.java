@@ -1,62 +1,45 @@
 package mtch.flinkmqtt.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.avro.AvroMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.protobuf.ProtobufFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
 
 /**
  * Created by mchaubal on 1/6/18.
  */
-public class FormatManager<OUT> implements Serializable{
+public class FormatManager<OUT, T extends ObjectMapper> implements Serializable{
 
-    public enum AVAILABLE_FORMATS {XML, JSON, AVRO, PROTOBUF};
+    private final ObjectMapper mapper;
 
-    private ObjectMapper mapper;
-
-    private final Class<OUT> genericClass;
+    private final Class<OUT> outClass;
 
 
 
-    public FormatManager(AVAILABLE_FORMATS format, Class<OUT> outclass) throws UnsupportedOperationException{
-        if(!contains(format.toString())) {
-            throw new UnsupportedOperationException(
-                    String.format("Data format %s not recognized. Available values %s%n",
-                            format, AVAILABLE_FORMATS.values()));
+    public FormatManager() throws InstantiationException, IllegalAccessException{
 
-        }
-            switch (format) {
-                case  XML: mapper = new XmlMapper(); break;
-                case JSON : mapper = new ObjectMapper(); break;
-                case AVRO : mapper = new AvroMapper(); break;
-                case PROTOBUF : mapper = new ObjectMapper(new ProtobufFactory());
+        mapper = Builder.createInstance(getClassOfT());
 
-        }
-
-        this.genericClass = outclass;
+        outClass = getClassOfOUT();
     }
 
     public OUT build(byte[] data) throws IOException {
-        return mapper.readValue(data, genericClass);
+        return mapper.readValue(data, outClass);
     }
 
 
-
-    private final boolean contains(String test) {
-
-        for (AVAILABLE_FORMATS c : AVAILABLE_FORMATS.values()) {
-            if (c.name().equals(test)) {
-                return true;
-            }
+    private static class Builder {
+        static <T> T createInstance(Class clazz) throws InstantiationException, IllegalAccessException{
+            T t = (T) clazz.newInstance();
+            return t;
         }
-
-        return false;
     }
 
-    private final void throwError(String message) {
-        throw new UnsupportedOperationException(message);
+    private final Class<OUT> getClassOfOUT() {
+        return (Class<OUT>)  ((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    }
+    private final Class<T> getClassOfT() {
+        return (Class<T>)  ((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 }
