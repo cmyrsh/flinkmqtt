@@ -13,7 +13,7 @@
         <PAHO_VERSION>1.0.2</PAHO_VERSION>
         <flink.version>1.4.0</flink.version>
         <scala.binary.version>2.11</scala.binary.version>
-        <jackson.version>2.9.0</jackson.version>
+        <jackson.version>2.10.3</jackson.version>
     </properties>
 
 
