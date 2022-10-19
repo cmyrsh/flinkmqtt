@@ -13,7 +13,7 @@
         <PAHO_VERSION>[1.2.1,)</PAHO_VERSION>
         <flink.version>1.4.0</flink.version>
         <scala.binary.version>2.11</scala.binary.version>
-        <jackson.version>2.12.1</jackson.version>
+        <jackson.version>2.13.4.1</jackson.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
